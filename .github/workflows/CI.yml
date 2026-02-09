@@ -50,7 +50,7 @@ jobs:
     - name: Build AviSynth/VapourSynth plugin
       run: |
         pushd FFmpeg
-        ./configure --enable-gpl --enable-version3 --disable-static --enable-shared --disable-all --disable-autodetect --enable-avcodec --enable-avformat --enable-swresample --enable-swscale --disable-asm --disable-debug
+        ./configure --enable-gpl --enable-version3 --enable-static --disable-shared --disable-all --disable-autodetect --enable-avcodec --enable-avformat --enable-swresample --enable-swscale --disable-asm --disable-debug
         make -j2
         sudo make install -j2
         popd
