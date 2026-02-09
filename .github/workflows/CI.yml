@@ -62,3 +62,21 @@ jobs:
         cmake --build build_avs -j 2
         cmake -B build_vs -DBUILD_AVS_PLUGIN=OFF "${cmake_settings[@]}"
         cmake --build build_vs -j 2
+        
+    - name: Upload Linux Build
+      if: ${{ matrix.os == 'ubuntu-latest' }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: L-SMASH-Works-Linux-Plugin
+        path: |
+          build_vs/*.so
+          build_avs/*.so
+
+    - name: Upload macOS Build
+      if: ${{ matrix.os == 'macos-latest' }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: L-SMASH-Works-macOS-Plugin
+        path: |
+          build_vs/*.dylib
+          build_avs/*.dylib
