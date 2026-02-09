@@ -63,20 +63,23 @@ jobs:
         cmake -B build_vs -DBUILD_AVS_PLUGIN=OFF "${cmake_settings[@]}"
         cmake --build build_vs -j 2
         
-    - name: Upload Linux Build
-      if: ${{ matrix.os == 'ubuntu-latest' }}
-      uses: actions/upload-artifact@v4
-      with:
-        name: L-SMASH-Works-Linux-Plugin
-        path: |
-          build_vs/*.so
-          build_avs/*.so
+    - name: Collect all necessary files
+      run: |
+        mkdir -p ./dist
+        # 使用通配符，不管是 libvslsmash 还是 libLSMASH 都能抓到
+        find build_vs -name "*.so" -exec cp {} ./dist/ \; 2>/dev/null || true
+        find build_vs -name "*.dylib" -exec cp {} ./dist/ \; 2>/dev/null || true
+        find build_avs -name "*.so" -exec cp {} ./dist/ \; 2>/dev/null || true
+        
+        # 抓取那个折磨人的 liblsmash.so.2
+        # 注意：macOS 不需要这个，所以只在 Linux 下报错时不中断
+        if [ "${{ matrix.os }}" = "ubuntu-latest" ]; then
+          cp /usr/local/lib/liblsmash.so.2 ./dist/ || echo "liblsmash.so.2 not found"
+        fi
 
-    - name: Upload macOS Build
-      if: ${{ matrix.os == 'macos-latest' }}
+    - name: Upload Complete Plugin Set
       uses: actions/upload-artifact@v4
       with:
-        name: L-SMASH-Works-macOS-Plugin
-        path: |
-          build_vs/*.dylib
-          build_avs/*.dylib
+        # 加上 matrix.os 前缀，防止 ubuntu 和 macos 的产物重名覆盖
+        name: L-SMASH-Works-${{ matrix.os }}-Pack
+        path: ./dist/
